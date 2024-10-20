@@ -2,77 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PolarHost • Status</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
+            padding: 0;
             font-family: 'Montserrat', sans-serif;
             background-color: #303030;
             color: white;
             text-align: center;
         }
-        .header {
-            background-color: #007BFF;
-            padding: 20px;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .container {
-            padding: 20px;
-        }
         .status {
-            background-color: #212121;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px auto;
-            width: 80%;
-            max-width: 600px;
+            margin: 20px;
         }
-        .status h2 {
-            margin: 10px 0;
-        }
-        .status span {
-            display: inline-block;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        .status-up {
-            color: green;
-        }
-        .status-down {
-            color: red;
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
         }
     </style>
-    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <div class="header">
-        <h1>PolarHost Status</h1>
+    <h1>Polar Status</h1>
+    <div class="status" id="status">
+        Loading status...
     </div>
-    <div class="container">
-        <div class="status">
-            <h2>Homepage Status: <span id="homepage-status" class="status-up">Online</span></h2>
-            <h2>Panel Status: <span id="panel-status" class="status-up">Online</span></h2>
-            <h2>Dashboard Status: <span id="dashboard-status" class="status-up">Online</span></h2>
-        </div>
-    </div>
+
     <script>
-        const socket = io();
-        socket.on('statusUpdate', (data) => {
-            const { homepage, panel, dashboard } = data;
-            const homepageStatus = document.getElementById('homepage-status');
-            const panelStatus = document.getElementById('panel-status');
-            const dashboardStatus = document.getElementById('dashboard-status');
-            homepageStatus.innerText = homepage.status ? 'Online' : 'Offline';
-            homepageStatus.className = homepage.status ? 'status-up' : 'status-down';
-            panelStatus.innerText = panel.status ? 'Online' : 'Offline';
-            panelStatus.className = panel.status ? 'status-up' : 'status-down';
-            dashboardStatus.innerText = dashboard.status ? 'Online' : 'Offline';
-            dashboardStatus.className = dashboard.status ? 'status-up' : 'status-down';
-        });
+        const apiUrl = 'https://polarstatus.onrender.com/api/status';
+
+        const fetchStatus = () => {
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('status').innerText = `Homepage: ${data.homepage}, Panel: ${data.panel}, Dashboard: ${data.dashboard}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
+                    document.getElementById('status').innerText = 'Error fetching status';
+                });
+        };
+
+        fetchStatus();
+        setInterval(fetchStatus, 30000); // Fetch status every 30 seconds
     </script>
 </body>
 </html>
