@@ -2,56 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PolarHost • Status</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #303030;
             color: white;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #007BFF;
         }
         .status {
-            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 24px;
-            }
+        .status-box {
+            background-color: #212121;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            text-align: center;
+        }
+        .status-box span {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>Polar Status</h1>
-    <div class="status" id="status">
-        Loading status...
+
+    <h1>PolarHost Status</h1>
+    <div class="status">
+        <div class="status-box" id="homepage-status">
+            <h2>Homepage</h2>
+            <span>Status: <span id="homepage"></span></span>
+        </div>
+        <div class="status-box" id="panel-status">
+            <h2>Panel</h2>
+            <span>Status: <span id="panel"></span></span>
+        </div>
+        <div class="status-box" id="dashboard-status">
+            <h2>Dashboard</h2>
+            <span>Status: <span id="dashboard"></span></span>
+        </div>
     </div>
 
     <script>
-        const apiUrl = 'https://polarstatus.onrender.com/api/status';
-
-        const fetchStatus = () => {
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    document.getElementById('status').innerText = `Homepage: ${data.homepage}, Panel: ${data.panel}, Dashboard: ${data.dashboard}`;
-                })
-                .catch(error => {
-                    console.error('Error fetching status:', error);
-                    document.getElementById('status').innerText = 'Error fetching status';
-                });
-        };
-
-        fetchStatus();
-        setInterval(fetchStatus, 30000); // Fetch status every 30 seconds
+        fetch('https://polarstatus.onrender.com/api/status')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('homepage').innerText = data.homepage;
+            document.getElementById('panel').innerText = data.panel;
+            document.getElementById('dashboard').innerText = data.dashboard;
+        })
+        .catch(err => {
+            console.log('Error:', err);
+        });
     </script>
+
 </body>
 </html>
